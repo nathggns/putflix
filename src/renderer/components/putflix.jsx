@@ -10,6 +10,11 @@ import _ from 'lodash';
 import * as TheVideos from '../../modules/thevideo';
 
 class Component extends React.Component {
+
+	constructor(props) {
+		super();
+	}
+
 	async asyncSetState(state) {
 		await new Promise((resolve, reject) => {
 			this.setState(state, resolve);
@@ -17,24 +22,55 @@ class Component extends React.Component {
 	}
 }
 
-// Component to wrap a video in
-export class TheVideosTVVideo extends Component {
+export class Episode extends Component {
 
 	state = {
-		loadedSources : false,
-		sources : [],
-		sourceIdx : -1
+		theVideosKey : null
 	}
 
 	constructor(props) {
 		super();
 		this.props = props;
+
+		this.setTheVideosKey();
+	}
+
+	componentWillReceiveProps() {
+		this.setVideoSources();
+	}
+
+	async setTheVideosKey() {
+		await this.asyncSetState({
+			theVideosKey : await this.props.episode.getTheVideosKey()
+		});
+	}
+
+	render() {
+		return this.state.theVideosKey && <TheVideosTVVideo id={this.state.theVideosKey} />;
+	}
+
+}
+
+// Component to wrap a video in
+// @todo Error handling
+export class TheVideosTVVideo extends Component {
+
+	state = {
+		loadedSources : false,
+		sources : [],
+		sourceIdx : -1,
+		id : ''
+	}
+
+	constructor(props) {
+		super();
+		this.state.id = props.id;
 		this.setVideoSources();
 	}
 
 	getURL() {
 		// @todo: Size? 
-		return `http://thevideos.tv/embed-${this.props.id}-728x410.html`;
+		return `http://thevideos.tv/embed-${this.state.id}-728x410.html`;
 	}
 
 	componentWillReceiveProps() {

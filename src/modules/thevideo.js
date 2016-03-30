@@ -13,6 +13,9 @@ export function decodeData(p,a,c,k,e,d) {
 }
 
 export function decodeHTML(html) {
+	if (html.match(/sources:/)) {
+		return html;
+	}
 	// @todo: There HAS to be a better way to do this
 	const args = eval('(function() { return Array.from(arguments); }' + html.match(/eval.+?\;return p\}([^\n]+)/)[1]);
 

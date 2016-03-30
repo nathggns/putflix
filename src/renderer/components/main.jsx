@@ -1,12 +1,13 @@
 'use strict';
 
 import React from 'react';
-import { TheVideosTVVideo } from './putflix';
+import { Episode as EpisodeComponent } from './putflix';
+import { Episode } from '../../modules/putlocker';
 
 export class Main extends React.Component {
   render() {
     return (
-      <TheVideosTVVideo id="tmjf0dyacsi3" />
+      <EpisodeComponent episode={new Episode('the-flash', 1, 1)} />
     );
   }
 }
