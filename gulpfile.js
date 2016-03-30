@@ -186,7 +186,7 @@ gulp.task('serve', ['inject:css', 'compile:scripts:watch', 'compile:styles', 'mi
   electron.start();
   gulp.watch([srcDir + '/renderer/index.html'], ['inject:css']);
   gulp.watch([serveDir + '/app.js', serveDir + '/browser/**/*.js'], electron.restart);
-  gulp.watch([serveDir + '/styles/**/*.css', serveDir + '/renderer/**/*.html', serveDir + '/renderer/**/*.js'], electron.reload);
+  gulp.watch([serveDir + '/styles/**/*.css', serveDir + '/renderer/**/*.html', serveDir + '/renderer/**/*.js', serveDir + '/modules/**/*.js'], electron.reload);
 });
 
 gulp.task('build', ['html', 'compile:scripts', 'packageJson', /*'copy:fonts',*/ 'misc']);
