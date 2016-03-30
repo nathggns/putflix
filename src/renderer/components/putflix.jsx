@@ -9,19 +9,9 @@ import _ from 'lodash';
 // @todo: Make this nicer using the symlink trick
 import * as TheVideos from '../../modules/thevideo';
 import { FittedVideo } from './fitted';
+import { Component } from './util';
+import { Page } from '../../modules/putlocker';
 
-class Component extends React.Component {
-
-	constructor(props) {
-		super();
-	}
-
-	async asyncSetState(state) {
-		await new Promise((resolve, reject) => {
-			this.setState(state, resolve);
-		});
-	}
-}
 
 export class Episode extends Component {
 
@@ -31,13 +21,9 @@ export class Episode extends Component {
 
 	constructor(props) {
 		super();
+		
 		this.props = props;
-
 		this.setTheVideosKey();
-	}
-
-	componentWillReceiveProps() {
-		this.setVideoSources();
 	}
 
 	async setTheVideosKey() {
@@ -60,41 +46,53 @@ export class TheVideosTVVideo extends Component {
 		loadedSources : false,
 		sources : [],
 		sourceIdx : -1,
-		id : ''
+		id : '',
+		loading : true
 	}
 
 	constructor(props) {
 		super();
-		this.state.id = props.id;
+		
+		this.props = props;
 		this.setVideoSources();
 	}
 
 	getURL() {
 		// @todo: Size? 
-		return `http://thevideos.tv/embed-${this.state.id}-728x410.html`;
-	}
-
-	componentWillReceiveProps() {
-		this.setVideoSources();
+		return `http://thevideos.tv/embed-${this.props.id}-728x410.html`;
 	}
 
 	async fetchVideoSources() {
+		const page = await Page.fromURL(this.getURL());
+
+		if (page.status !== 200) {
+			alert('Failed to Load');
+			throw new Error('Failed to load');
+		}
+
 		return TheVideos.getSources(
-			TheVideos.decodeHTML(await (await fetch(this.getURL())).text())
+			TheVideos.decodeHTML(await page.text)
 		);
 	}
 
 	async setVideoSources() {
+		const sources = await this.fetchVideoSources();
+
 		// @todo: What should default source be?
 		await this.asyncSetState({
-			sources : await this.fetchVideoSources(),
+			sources : sources,
 			sourceIdx : 0,
-			loadedSources : true
+			loadedSources : true,
+			loading : false
 		});
 	}
 
 	render() {
-		return this.state.loadedSources && <FittedVideo src={this.state.sources[this.state.sourceIdx].file} />
+		return this.state.loading
+			? <h1>Loading</h1>
+			: (
+				this.state.loadedSources && <FittedVideo src={this.state.sources[this.state.sourceIdx].file} />
+			)
 	}
 
 }

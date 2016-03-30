@@ -4,6 +4,7 @@ import fetch from 'node-fetch';
 import Q from 'q';
 
 import { decodePutlockerData } from './util';
+import cheerio from 'cheerio';
 
 Q.longStackSupport = true;
 
@@ -13,9 +14,43 @@ export class Page {
 		this.text = response.text();
 	}
 
+	static async fromURL(url) {
+		return new Page(await fetch(url));
+	}
+
 	verify() {
 		return this.response.status === 200;
 	}
+}
+
+export class Browser {
+
+	constructor() {
+
+	}
+
+	async search(string) {
+		const page = await Page.fromURL(`http://putlocker.is/search/search.php?q=${encodeURIComponent(string)}`);
+		const text = await page.text;
+		const $ = cheerio.load(text);
+		
+		return Array.from($('h2 ~ h2 + table td > a')).map((link, idx) => {
+			const $link = $(link);
+			const href = $link.attr('href');
+			const match = href.match(/watch-(.+?)-tvshow/);
+
+			if (!match) {
+				return false;
+			}
+
+			const key = match[1];
+			const name = $link.attr('title');
+			const image = $link.find('img').attr('src');
+
+			return { key, name, image };
+		}).filter(i => !!i);
+	}
+
 }
 
 export class Episode {

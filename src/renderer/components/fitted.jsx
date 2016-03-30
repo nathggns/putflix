@@ -1,5 +1,5 @@
 import React from 'react';
-import { Fit } from './mixins';
+import { Fit } from './util';
 
 class _FittedVideo extends React.Component {
 
