@@ -65,7 +65,7 @@ export class TheVideosTVVideo extends Component {
 	async fetchVideoSources() {
 		const page = await Page.fromURL(this.getURL());
 
-		if (page.status !== 200) {
+		if (!page.verify()) {
 			alert('Failed to Load');
 			throw new Error('Failed to load');
 		}

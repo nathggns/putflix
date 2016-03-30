@@ -19,10 +19,8 @@ app.on('window-all-closed', () => {
 
 app.on('ready', () => {
   //Menu.setApplicationMenu(appMenu);
-  mainWindow = new BrowserWindow({
-    width: 580,
-    height: 365
-  });
+  mainWindow = new BrowserWindow({});
+  mainWindow.openDevTools();
   mainWindow.loadURL('file://' + __dirname + '/renderer/index.html');
 });
 
