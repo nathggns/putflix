@@ -8,6 +8,7 @@ import _ from 'lodash';
 
 // @todo: Make this nicer using the symlink trick
 import * as TheVideos from '../../modules/thevideo';
+import { FittedVideo } from './fitted';
 
 class Component extends React.Component {
 
@@ -93,7 +94,7 @@ export class TheVideosTVVideo extends Component {
 	}
 
 	render() {
-		return this.state.loadedSources && <video src={this.state.sources[this.state.sourceIdx].file}></video>;
+		return this.state.loadedSources && <FittedVideo src={this.state.sources[this.state.sourceIdx].file} />
 	}
 
 }
