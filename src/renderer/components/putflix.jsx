@@ -5,10 +5,10 @@ import Q from 'q';
 import React from 'react';
 import cheerio from 'cheerio'; 	
 import _ from 'lodash';
+import { VideoPlayer } from './player';
 
 // @todo: Make this nicer using the symlink trick
 import * as TheVideos from '../../modules/thevideo';
-import { FittedVideo } from './fitted';
 import { Component } from './util';
 import { Page } from '../../modules/putlocker';
 
@@ -47,14 +47,15 @@ export class TheVideosTVVideo extends Component {
 		sources : [],
 		sourceIdx : -1,
 		id : '',
-		loading : true
+		loading : true,
+		poster : ''
 	}
 
 	constructor(props) {
 		super();
 		
 		this.props = props;
-		this.setVideoSources();
+		this.setVideoInfo();
 	}
 
 	getURL() {
@@ -62,25 +63,31 @@ export class TheVideosTVVideo extends Component {
 		return `http://thevideos.tv/embed-${this.props.id}-728x410.html`;
 	}
 
-	async fetchVideoSources() {
+	async fetchVideoInfo() {
 		const page = await Page.fromURL(this.getURL());
+		const text = await page.text;
+		const $ = cheerio.load(text);
 
 		if (!page.verify()) {
 			alert('Failed to Load');
 			throw new Error('Failed to load');
 		}
 
-		return TheVideos.getSources(
-			TheVideos.decodeHTML(await page.text)
+		const sources = TheVideos.getSources(
+			TheVideos.decodeHTML(text)
 		);
+
+		const poster = $('#vplayer img').attr('src');
+
+		return { sources, poster };
 	}
 
-	async setVideoSources() {
-		const sources = await this.fetchVideoSources();
+	async setVideoInfo() {
+		const { sources, poster } = await this.fetchVideoInfo();
 
 		// @todo: What should default source be?
 		await this.asyncSetState({
-			sources : sources,
+			sources, poster,
 			sourceIdx : 0,
 			loadedSources : true,
 			loading : false
@@ -91,7 +98,8 @@ export class TheVideosTVVideo extends Component {
 		return this.state.loading
 			? <h1>Loading</h1>
 			: (
-				this.state.loadedSources && <FittedVideo src={this.state.sources[this.state.sourceIdx].file} />
+				this.state.loadedSources &&
+					<VideoPlayer poster={this.state.poster} src={this.state.sources[this.state.sourceIdx].file} />
 			)
 	}
 

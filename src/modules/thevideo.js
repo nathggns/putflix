@@ -23,9 +23,17 @@ export function decodeHTML(html) {
 }
 
 export function getSources(script) {
+	const matches = script.match(/sources:\s*(.+?)\s*\,image/);
+
+	if (!matches) {
+		// @todo What is this bug???/
+		console.log(script);
+		alert('Loading error');
+		throw new Error('Loading error');
+	}
+
 	return _.chain(
-		script
-			.match(/sources:(.+?)\,image/)[1].match(/((file)|(label))\:"(.+?)"/g)
+		matches[1].match(/((file)|(label))\:"(.+?)"/g)
 			.map(item => item.slice(0, -1).split(':"'))
 	)
 		.chunk(2)

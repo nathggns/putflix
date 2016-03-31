@@ -1,56 +1,35 @@
 import React from 'react';
 
-/**
- * Use this to fit your component to the window size
- */
-export function Fit(Component) {
+export const OnResize = (function() {
+	let listeners = [];
 
-	class Fitter extends React.Component {
-		constructor() {
-			super();
+	window.addEventListener('resize', (e) => listeners.forEach(l => l(e)));
 
-			this.state = {
-				width : window.innerWidth,
-				height : window.innerHeight
-			};
+	function OnResize(Component) {
+		const oldMounted = Component.prototype.componentDidMount || (() => undefined);
+		const oldUnmount = Component.prototype.componentWillUnmount || (() => undefined);
 
-			this.handleResize = ::this.handleResize;
-		}
+		Component.prototype.componentDidMount = function() {
+			this._resizeListener = () => this.windowDidResize && this.windowDidResize(window.innerWidth, window.innerHeight);
+			listeners.push(this._resizeListener);
 
-		getProps() {
-			return {
-				style : {
-					width  : `${this.state.width}px`,
-					height : `${this.state.height}px`,
-					position : 'absolute',
-					top : 0,
-					left : 0
-				}
-			}
-		}
+			const result = oldMounted.apply(this, arguments);
 
-		handleResize() {
-			this.setState({
-				width : window.innnerWidth,
-				height : window.innerHeight
-			});
-		}
+			this._resizeListener();
 
-		componentDidMount() {
-			window.addEventListener('resize', this.handleResize);
-		}
+			return result;
+		};
 
-		comonentWillUnmount() {
-			window.removeEventListener('resize', this.handleResize);
-		}
+		Component.prototype.componentWillUnmount = function() {
+			listeners.splice(listeners.indexOf(this._resizeListener), 1);
 
-		render() {
-			return <Component {...this.props} {...this.getProps()} />;
+			return oldUnmount.apply(this, arguments);
 		}
 	}
 
-	return Fitter;
-}
+	return OnResize;
+
+})();
 
 export class Component extends React.Component {
 

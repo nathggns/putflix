@@ -5,6 +5,7 @@ import Q from 'q';
 
 import { decodePutlockerData } from './util';
 import cheerio from 'cheerio';
+import _ from 'lodash';
 
 Q.longStackSupport = true;
 
@@ -16,6 +17,10 @@ export class Page {
 
 	static async fromURL(url) {
 		return new Page(await fetch(url));
+	}
+
+	async $() {
+		return cheerio.load(await this.text);
 	}
 
 	verify() {
@@ -31,8 +36,7 @@ export class Browser {
 
 	async search(string) {
 		const page = await Page.fromURL(`http://putlocker.is/search/search.php?q=${encodeURIComponent(string)}`);
-		const text = await page.text;
-		const $ = cheerio.load(text);
+		const $ = await page.$();
 		
 		return Array.from($('h2 ~ h2 + table td > a')).map((link, idx) => {
 			const $link = $(link);
@@ -51,14 +55,39 @@ export class Browser {
 		}).filter(i => !!i);
 	}
 
+	async getEpisodes(show) {
+		const page = await Page.fromURL(`http://putlocker.is/watch-${show}-tvshow-online-free-putlocker.html`);
+		const $ = await page.$();
+		const seasons = Array.from($('.selector_name'));
+		const episodes = _.flatten(seasons.map(
+			season => {
+				const $season = $(season);
+				const seasonNumber = Number($season.find('strong').text().slice('Season '.length));
+				const $entries = Array.from($season.parent().next().find('.entry a').parent());
+
+				return $entries.map(entry => {
+					const $entry = $(entry);
+					const episodeNumber = Number($entry.find('strong').text().slice('Episode '.length));
+					const name = $entry.text().match(/-\s+([^\n]+)/)[1];
+					const episode = new Episode(show, seasonNumber, episodeNumber, name);
+
+					return { seasonNumber, episodeNumber, name, episode };
+				});
+			}
+		));
+
+		return episodes;
+	}
+
 }
 
 export class Episode {
 
-	constructor(id, season, episode) {
+	constructor(id, season, episode, name) {
 		this.id = id;
 		this.season = season;
 		this.episode = episode;
+		this.name = name;
 
 		this._page = null;
 	}
