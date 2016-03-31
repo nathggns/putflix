@@ -40,6 +40,11 @@ export class Main extends Component {
 		await this.asyncSetState({ selected });
 	}
 
+	async nextEpisode() {
+		const selected =  await this.browser.nextEpisode(this.state.selected);
+		this.setState({ selected });
+	}
+
 	backToSearch() {
 		this.setState({ selected : null });
 	}
@@ -59,7 +64,8 @@ export class Main extends Component {
 			{this.state.selected && 
 				<div>
 					<button onClick={::this.backToSearch}>Back</button>
-					<EpisodeComponent episode={this.state.selected.episode} />
+					<button onClick={::this.nextEpisode}>Next</button>
+					<EpisodeComponent episode={this.state.selected} />
 				</div>
 			}
 		</div>;

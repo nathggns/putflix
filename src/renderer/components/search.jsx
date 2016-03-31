@@ -78,7 +78,7 @@ class EpisodeSelector extends Component {
 		return <ul>
 			{ this.state.episodes.map((episode, idx) => 
 				<li key={idx} onClick={this.props.onChoose.bind(null, episode)}>
-					Season {episode.seasonNumber} Episode {episode.episodeNumber}: {episode.name}
+					Season {episode.season} Episode {episode.episode}: {episode.name}
 				</li>
 			)}
 		</ul>

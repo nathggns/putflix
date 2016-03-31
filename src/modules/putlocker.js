@@ -31,7 +31,7 @@ export class Page {
 export class Browser {
 
 	constructor() {
-
+		this.cache = {};
 	}
 
 	async search(string) {
@@ -55,11 +55,17 @@ export class Browser {
 		}).filter(i => !!i);
 	}
 
-	async getEpisodes(show) {
+	async getEpisodes(show, forceRefresh = false) {
+
+		if (this.cache[show] && !forceRefresh) {
+			return this.cache[show];
+		}
+
 		const page = await Page.fromURL(`http://putlocker.is/watch-${show}-tvshow-online-free-putlocker.html`);
 		const $ = await page.$();
 		const seasons = Array.from($('.selector_name'));
-		const episodes = _.flatten(seasons.map(
+		
+		return this.cache[show] = _.flatten(seasons.map(
 			season => {
 				const $season = $(season);
 				const seasonNumber = Number($season.find('strong').text().slice('Season '.length));
@@ -69,14 +75,54 @@ export class Browser {
 					const $entry = $(entry);
 					const episodeNumber = Number($entry.find('strong').text().slice('Episode '.length));
 					const name = $entry.text().match(/-\s+([^\n]+)/)[1];
-					const episode = new Episode(show, seasonNumber, episodeNumber, name);
-
-					return { seasonNumber, episodeNumber, name, episode };
+					return new Episode(show, seasonNumber, episodeNumber, name);
 				});
 			}
 		));
+	}
 
-		return episodes;
+	// async getEpisode(show, season, episode, fetchResult = true) {
+	// 	const cacheResult = this.getFromCache(Browser.getCacheKey(show, season, episode));
+
+	// 	if (cacheResult) {
+	// 		return cacheResult;
+	// 	} else if (fetchResult) {
+			
+	// 		const realResult = _.find(
+	// 			await this.getEpisodes(show), 
+	// 			r => r.seasonNumber === season && r.episodeNumber === episode
+	// 		);
+
+	// 		if (realResult) {
+	// 			return realResult;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
+
+	async siblingEpisode(episode, difference, useCache = true) {
+		const episodes = await this.getEpisodes(episode.id, !useCache);
+		const index = _.findIndex(episodes, fEpisode => fEpisode.season === episode.season && fEpisode.episode === episode.episode);
+
+		if (index !== -1) {
+			const newIndex = index + difference;
+			const newEpisode = episodes[newIndex];
+
+			if (newEpisode) {
+				return newEpisode;
+			}
+		}
+
+		return null;
+	}
+
+	async nextEpisode(episode) {
+		return await this.siblingEpisode(episode, 1);
+	}
+
+	async prevEpisode(episode) {
+		return await this.siblingEpisode(episode, -1);
 	}
 
 }
@@ -84,7 +130,7 @@ export class Browser {
 export class Episode {
 
 	constructor(id, season, episode, name) {
-		this.id = id;
+		this.id = this.show = id;
 		this.season = season;
 		this.episode = episode;
 		this.name = name;
@@ -95,6 +141,16 @@ export class Episode {
 	getURL() {
 		return `http://putlocker.is/watch-${this.id}-tvshow-season-${this.season}-episode-${this.episode}-online-free-putlocker.html`;
 	}
+
+	// static async verify(episodes) {
+	// 	for (episode of episodes) {
+	// 		if (episode.page().verify()) {
+	// 			return episode;
+	// 		}
+	// 	}
+
+	// 	return false;
+	// }
 
 	// @todo Can probably move this to a potential parent class
 	async page(text = false) {

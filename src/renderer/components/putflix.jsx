@@ -21,14 +21,18 @@ export class Episode extends Component {
 
 	constructor(props) {
 		super();
-		
+
+		this.componentWillReceiveProps(props);
+	}
+
+	componentWillReceiveProps(props) {
 		this.props = props;
 		this.setTheVideosKey();
 	}
 
 	async setTheVideosKey() {
 		await this.asyncSetState({
-			theVideosKey : await this.props.episode.getTheVideosKey()
+			theVideosKey : await this.props.episode.getTheVideosKey(),
 		});
 	}
 
@@ -54,6 +58,10 @@ export class TheVideosTVVideo extends Component {
 	constructor(props) {
 		super();
 		
+		this.componentWillReceiveProps(props);
+	}
+
+	componentWillReceiveProps(props) {
 		this.props = props;
 		this.setVideoInfo();
 	}
