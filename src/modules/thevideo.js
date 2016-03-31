@@ -23,7 +23,7 @@ export function decodeHTML(html) {
 }
 
 export function getSources(script) {
-	const matches = script.match(/sources:\s*(.+?)\s*\,image/);
+	const matches = script.match(/sources:\s*(.+?)\s*\,\s*image/);
 
 	if (!matches) {
 		// @todo What is this bug???/

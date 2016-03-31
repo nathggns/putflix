@@ -37,7 +37,10 @@ export class Episode extends Component {
 	}
 
 	render() {
-		return this.state.theVideosKey && <TheVideosTVVideo id={this.state.theVideosKey} />;
+		return this.state.theVideosKey && <TheVideosTVVideo
+			id={this.state.theVideosKey}
+			onEnded={this.props.onEnded}
+		/>;
 	}
 
 }
@@ -107,7 +110,11 @@ export class TheVideosTVVideo extends Component {
 			? <h1>Loading</h1>
 			: (
 				this.state.loadedSources &&
-					<VideoPlayer poster={this.state.poster} src={this.state.sources[this.state.sourceIdx].file} />
+					<VideoPlayer
+						poster={this.state.poster}
+						src={this.state.sources[this.state.sourceIdx].file}
+						onEnded={this.props.onEnded}
+					/>
 			)
 	}
 

@@ -41,8 +41,10 @@ export class Main extends Component {
 	}
 
 	async nextEpisode() {
-		const selected =  await this.browser.nextEpisode(this.state.selected);
-		this.setState({ selected });
+		const selected = this.state.selected;
+		await this.asyncSetState({ selected : null });
+
+		this.setState({ selected : await this.browser.nextEpisode(selected) });
 	}
 
 	backToSearch() {
@@ -65,7 +67,10 @@ export class Main extends Component {
 				<div>
 					<button onClick={::this.backToSearch}>Back</button>
 					<button onClick={::this.nextEpisode}>Next</button>
-					<EpisodeComponent episode={this.state.selected} />
+					<EpisodeComponent
+						episode={this.state.selected}
+						onEnded={::this.nextEpisode} // @todo Should do a timer like netflix does
+					/>
 				</div>
 			}
 		</div>;
