@@ -52,9 +52,6 @@ export class Main extends Component {
 	}
 
 	render() {
-
-		return <EpisodeComponent episode={new Episode('the-flash', 1, 1, 'The Fastest Man Alive')} />;
-
 		return <div style={[
 			styles.base,
 			styles.fullSize
