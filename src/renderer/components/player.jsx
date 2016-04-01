@@ -12,6 +12,7 @@ export class VideoPlayer extends React.Component {
 
 		this.onEnded = ::this.onEnded;
 		this.videoCanPlayThrough = ::this.videoCanPlayThrough;
+		this.videoSeek = ::this.videoSeek;
 	}
 
 	componentWillReceiveProps(props) {
@@ -21,14 +22,22 @@ export class VideoPlayer extends React.Component {
 	}
 
 	componentDidMount() {
-		this.refs.video.getDOMNode().addEventListener('ended', this.onEnded);
-		this.refs.video.getDOMNode().addEventListener('canplaythrough', this.videoCanPlayThrough);
+		const video = this.refs.video.getDOMNode();
+		video.addEventListener('ended', this.onEnded);
+		video.addEventListener('canplaythrough', this.videoCanPlayThrough);
+		video.addEventListener('seeked', this.videoSeek);
 		this.componentWillReceiveProps(this.props);
 	}
 
 	componentWillUnmount() {
-		this.refs.video.getDOMNode().removeEventListener('ended', this.onEnded);
-		this.refs.video.getDOMNode().removeEventListener('canplaythrough', this.videoCanPlayThrough);
+		const video = this.refs.video.getDOMNode();
+		video.removeEventListener('ended', this.onEnded);
+		video.removeEventListener('canplaythrough', this.videoCanPlayThrough);
+		video.removeEventListener('seeked', this.videoSeek);
+	}
+
+	videoSeek() {
+		this.setState({ currentTime : this.refs.video.getDOMNode().currentTime });
 	}
 
 	onClick() {
