@@ -99,7 +99,7 @@ export class TheVideosTVVideo extends Component {
 		// @todo: What should default source be?
 		await this.asyncSetState({
 			sources, poster,
-			sourceIdx : 0,
+			sourceIdx : sources.length - 1,
 			loadedSources : true,
 			loading : false
 		});
@@ -112,7 +112,8 @@ export class TheVideosTVVideo extends Component {
 				this.state.loadedSources &&
 					<VideoPlayer
 						poster={this.state.poster}
-						src={this.state.sources[this.state.sourceIdx].file}
+						sources={this.state.sources}
+						//src={this.state.sources[this.state.sourceIdx].file}
 						onEnded={this.props.onEnded}
 					/>
 			)

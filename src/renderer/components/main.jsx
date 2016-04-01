@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { Episode as EpisodeComponent } from './putflix';
-import { Browser } from '../../modules/putlocker';
+import { Browser, Episode } from '../../modules/putlocker';
 import { Search } from './search';
 import { Component } from './util';
 import Radium from 'radium';
@@ -52,6 +52,8 @@ export class Main extends Component {
 	}
 
 	render() {
+
+		return <EpisodeComponent episode={new Episode('the-flash', 1, 1, 'The Fastest Man Alive')} />;
 
 		return <div style={[
 			styles.base,
