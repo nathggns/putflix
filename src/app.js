@@ -20,7 +20,7 @@ app.on('window-all-closed', () => {
 app.on('ready', () => {
   //Menu.setApplicationMenu(appMenu);
   mainWindow = new BrowserWindow({});
-  mainWindow.openDevTools();
+  // mainWindow.openDevTools();
   mainWindow.loadURL('file://' + __dirname + '/renderer/index.html');
 });
 

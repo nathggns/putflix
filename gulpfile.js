@@ -116,7 +116,7 @@ gulp.task('bundle:dependencies', function () {
     }else{
       main = [packageJson.main];
     }
-    return {name: dep, main: main.map(function (it) {return path.basename(it);})};
+    return {name: dep, main: main};
   });
 
   // add babel/polyfill module
@@ -127,7 +127,7 @@ gulp.task('bundle:dependencies', function () {
     it.main.forEach(function (entry) {
       var b = browserify('node_modules/' + it.name + '/' + entry, {
         detectGlobal: false,
-        standalone: entry
+        standalone: path.basename(it.name)
       });
       excludeModules.forEach(function (moduleName) {b.exclude(moduleName)});
       streams.push(b.bundle()
@@ -166,7 +166,8 @@ gulp.task('package', ['win32', 'darwin', 'linux'].map(function (platform) {
       arch: 'x64',
       platform: platform,
       out: releaseDir + '/' + platform,
-      version: '0.28.1'
+      version: '0.29.2',
+      ignore: 'node_modules'
     }, function (err) {
       done();
     });
