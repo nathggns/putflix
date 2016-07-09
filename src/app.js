@@ -1,10 +1,11 @@
-'use strict';
-require('babel/polyfill');
+import 'babel/polyfill';
 
-import app from 'app';
-import BrowserWindow from 'browser-window';
-import crashReporter from 'crash-reporter';
-import Menu from 'menu';
+// import app from 'app';
+// import BrowserWindow from 'browser-window';
+// import crashReporter from 'crash-reporter';
+// import Menu from 'menu';
+
+import { app, BrowserWindow, crashReporter, Menu } from 'electron';
 import appMenu from './browser/menu/appMenu';
 
 let mainWindow = null;

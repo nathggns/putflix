@@ -1,8 +1,10 @@
 'use strict';
 
-import app from 'app';
-import Menu from 'menu';
-import MenuItem from 'menu-item';
+// import app from 'app';
+// import Menu from 'menu';
+// import MenuItem from 'menu-item';
+
+import { app, Menu, MenuItem } from 'electron';
 
 let template = [{
   label: 'Putflix',
